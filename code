@@ -1,0 +1,67 @@
+'choose fold path
+Sub choosepath()
+
+Dim GetFolder As String
+
+Set fldr = Application.FileDialog(msoFileDialogFolderPicker)
+With fldr
+    .Title = "Please Select a Folder"
+    .InitialFileName = "C:\"
+    .AllowMultiSelect = False
+    If .Show = -1 Then
+     
+    GetFolder = .SelectedItems(1)
+    Else
+     GoTo Last
+     
+    End If
+End With
+Sheet1.Range("b1") = GetFolder
+
+Last:
+End Sub
+
+'get old file names
+
+Sub OldFileNames()
+Dim arr
+
+Set fs = CreateObject("scripting.filesystemobject")
+
+path = Sheet1.Range("B1").Text
+
+Set arr = fs.GetFolder(path)
+
+j = 3
+For Each i In arr.Files
+    Range("A" & j) = "'" & fs.getbasename(i)
+    j = j + 1
+Next
+
+End Sub
+
+'Change names
+Sub FileNameChange()
+Dim a As Integer
+
+Set dict = CreateObject("Scripting.Dictionary")
+brr = Sheet1.Range("A3:B" & Sheet1.Range("A65536").End(xlUp).Row)
+For a = 1 To UBound(brr)
+    If Not dict.exists(brr(a, 1)) Then
+        dict(brr(a, 1)) = brr(a, 2)
+    End If
+    
+Next
+
+Set fs = CreateObject("scripting.filesystemobject")
+
+path = Sheet1.Range("B1").Text
+
+Set arr = fs.GetFolder(path)
+For Each i In arr.Files
+    i.Name = dict(fs.getbasename(i)) & "." & fs.getextensionname(i)
+    
+Next
+
+
+End Sub
